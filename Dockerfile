@@ -20,7 +20,8 @@ RUN groupadd --gid 10001 inverterscout \
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 RUN python -m pip install --no-cache-dir --upgrade "pip==26.2.1" \
-    && python -m pip install --no-cache-dir .
+    && python -m pip install --no-cache-dir . \
+    && python -m pip uninstall --yes pip
 
 RUN mkdir -p /app/data && chown -R inverterscout:inverterscout /app/data
 USER inverterscout
