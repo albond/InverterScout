@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/github/license/albond/InverterScout?color=E08963&style=flat-square)](LICENSE)
 [![Project status: alpha](https://img.shields.io/badge/status-alpha-D97706?style=flat-square)](#quick-start)
+[![Latest release](https://img.shields.io/github/v/release/albond/InverterScout?include_prereleases&style=flat-square&color=8B5CF6)](https://github.com/albond/InverterScout/releases)
 [![Python 3.12–3.14](https://img.shields.io/badge/Python-3.12%E2%80%933.14-3776AB?logo=python&logoColor=white&style=flat-square)](https://www.python.org/)
 [![Docker ready](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white&style=flat-square)](#quick-start)
 [![CI](https://img.shields.io/github/actions/workflow/status/albond/InverterScout/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/albond/InverterScout/actions/workflows/ci.yml)
