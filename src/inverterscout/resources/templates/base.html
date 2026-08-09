@@ -1,0 +1,65 @@
+{% from "_icons.html" import icon %}
+<!doctype html>
+<html lang="{{ language_code }}" dir="{{ text_direction }}" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ title | default(t('app.name')) }}</title>
+  <link rel="icon" href="/static/images/brand.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/theme-init.js"></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="app-body">
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/" aria-label="{{ t('app.name') }}">
+        <img src="/static/images/brand.svg" alt="" width="38" height="38">
+        <span class="brand-name">Inverter<span class="brand-suffix"><strong>Scout</strong></span></span>
+      </a>
+      <nav class="primary-nav" aria-label="{{ t('common.navigation') }}">
+        <ul class="nav-list">
+          {% for href, label_key in nav_links %}
+          <li>
+            <a class="nav-link" href="{{ href }}" {% if active_page == href %}aria-current="page"{% endif %}>
+              {% if href == '/' %}{{ icon('gauge', 'nav-icon') }}
+              {% elif href == '/devices' %}{{ icon('devices', 'nav-icon') }}
+              {% elif href == '/device-log' %}{{ icon('history', 'nav-icon') }}
+              {% elif href == '/admin' %}{{ icon('users', 'nav-icon') }}
+              {% else %}{{ icon('settings', 'nav-icon') }}{% endif %}
+              <span class="nav-label">{{ t(label_key) }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        data-label-light="{{ t('common.theme_light') }}"
+        data-label-dark="{{ t('common.theme_dark') }}"
+        aria-label="{{ t('common.theme_dark') }}"
+      >
+        {{ icon('moon', 'icon moon-icon') }}
+        {{ icon('sun', 'icon sun-icon') }}
+      </button>
+    </div>
+  </header>
+  <main class="container app-main">
+    {% if showcase_mode %}
+    <div class="showcase-banner" role="note">
+      {{ icon('shield') }}
+      <span>{{ t('showcase.banner') }}</span>
+    </div>
+    {% endif %}
+    {% if msg %}<div class="notice success" role="status">{{ icon('check') }}<span>{{ msg }}</span></div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="app-footer">{{ t('app.name') }} · {{ app_version }}</footer>
+  <script src="/static/js/app.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

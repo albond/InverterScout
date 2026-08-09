@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% macro action_form(chat_id, action, label, variant, icon_name) -%}
+<form class="inline-form" method="post" action="/admin">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="chat_id" value="{{ chat_id }}">
+  <input type="hidden" name="action" value="{{ action }}">
+  <button type="submit" class="{{ variant }}">{{ icon(icon_name) }}<span>{{ label }}</span></button>
+</form>
+{%- endmacro %}
+{% macro person(user) -%}
+<div class="person-cell">
+  <span class="person-avatar">{{ user.initial }}</span>
+  <span class="person-copy"><strong>{{ user.display_name }}</strong><small><bdi dir="ltr">{{ user.username }}</bdi></small></span>
+</div>
+{%- endmacro %}
+{% block content %}
+<div class="page-head">
+  <div class="page-intro">
+    <div class="eyebrow">{{ icon('shield') }}<span>{{ t('nav.access') }}</span></div>
+    <h1>{{ t('access.title') }}</h1>
+    <p class="muted">{{ t('access.manual_notice') }}</p>
+  </div>
+</div>
+
+{% if telegram_disabled %}<div class="notice">{{ icon('telegram') }}<span>{{ t('telegram.not_configured') }}</span></div>{% endif %}
+
+<section class="count-grid access-count-grid">
+  <article class="metric-card pending">
+    <div class="metric-card-top"><span class="metric-label">{{ t('access.pending') }}</span><span class="metric-icon">{{ icon('clock') }}</span></div>
+    <div class="metric">{{ pending_count }}</div>
+    <div class="metric-caption">{{ t('access.pending_caption') }}</div>
+  </article>
+  <article class="metric-card approved">
+    <div class="metric-card-top"><span class="metric-label">{{ t('access.approved') }}</span><span class="metric-icon">{{ icon('user-check') }}</span></div>
+    <div class="metric">{{ active_count }}</div>
+    <div class="metric-caption">{{ t('access.approved_caption') }}</div>
+  </article>
+  <article class="metric-card blocked">
+    <div class="metric-card-top"><span class="metric-label">{{ t('access.blocked') }}</span><span class="metric-icon">{{ icon('user-block') }}</span></div>
+    <div class="metric">{{ blocked_count }}</div>
+    <div class="metric-caption">{{ t('access.blocked_caption') }}</div>
+  </article>
+</section>
+
+<section class="access-section pending-section">
+  <div class="section-heading"><h2>{{ t('access.pending') }}</h2><span class="tag warning-tag">{{ pending_count }}</span></div>
+  {% if pending_users %}
+  <div class="table-wrap responsive-table access-table">
+    <table>
+      <thead><tr><th>{{ t('devices.name') }}</th><th>{{ t('access.identity') }}</th><th>{{ t('access.status') }}</th><th></th></tr></thead>
+      <tbody>
+      {% for user in pending_users %}
+      <tr data-user-row data-user-id="{{ user.chat_id }}">
+        <td data-label="{{ t('devices.name') }}">{{ person(user) }}</td>
+        <td data-label="{{ t('access.identity') }}"><code class="identity-chip"><bdi dir="ltr">{{ user.chat_id }}</bdi></code></td>
+        <td data-label="{{ t('access.status') }}"><span class="access-status pending"><i></i>{{ t('access.status_pending') }}</span></td>
+        <td class="actions-cell"><div class="action-group">{{ action_form(user.chat_id, 'approve', t('access.approve'), '', 'user-check') }}{{ action_form(user.chat_id, 'block', t('access.block'), 'danger', 'user-block') }}</div></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="panel empty-state">{{ icon('user-check') }}<span>{{ t('access.no_pending') }}</span></div>{% endif %}
+</section>
+
+<section class="access-section approved-section">
+  <div class="section-heading"><h2>{{ t('access.approved') }}</h2><span class="tag positive-tag">{{ active_count }}</span></div>
+  {% if active_users %}
+  <div class="table-wrap responsive-table access-table">
+    <table>
+      <thead><tr><th>{{ t('devices.name') }}</th><th>{{ t('access.identity') }}</th><th>{{ t('access.status') }}</th><th></th></tr></thead>
+      <tbody>
+      {% for user in active_users %}
+      <tr data-user-row data-user-id="{{ user.chat_id }}"><td data-label="{{ t('devices.name') }}">{{ person(user) }}</td><td data-label="{{ t('access.identity') }}"><code class="identity-chip"><bdi dir="ltr">{{ user.chat_id }}</bdi></code></td><td data-label="{{ t('access.status') }}"><span class="access-status approved"><i></i>{{ t('access.status_approved') }}</span></td><td class="actions-cell">{{ action_form(user.chat_id, 'block', t('access.block'), 'danger', 'user-block') }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="panel empty-state">{{ icon('users') }}<span>{{ t('access.no_approved') }}</span></div>{% endif %}
+</section>
+
+<section class="access-section blocked-section">
+  <div class="section-heading"><h2>{{ t('access.blocked') }}</h2><span class="tag danger-tag">{{ blocked_count }}</span></div>
+  {% if blocked_users %}
+  <div class="table-wrap responsive-table access-table">
+    <table>
+      <thead><tr><th>{{ t('devices.name') }}</th><th>{{ t('access.identity') }}</th><th>{{ t('access.status') }}</th><th></th></tr></thead>
+      <tbody>
+      {% for user in blocked_users %}
+      <tr data-user-row data-user-id="{{ user.chat_id }}"><td data-label="{{ t('devices.name') }}">{{ person(user) }}</td><td data-label="{{ t('access.identity') }}"><code class="identity-chip"><bdi dir="ltr">{{ user.chat_id }}</bdi></code></td><td data-label="{{ t('access.status') }}"><span class="access-status blocked"><i></i>{{ t('access.status_blocked') }}</span></td><td class="actions-cell">{{ action_form(user.chat_id, 'unblock', t('access.unblock'), 'secondary', 'user-check') }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<div class="panel empty-state">{{ icon('shield') }}<span>{{ t('access.no_blocked') }}</span></div>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="/static/js/admin.js" defer></script>{% endblock %}

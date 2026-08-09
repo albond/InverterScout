@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="InverterScout">
+  <defs>
+    <linearGradient id="a" x1="8" y1="6" x2="57" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffbd82"/>
+      <stop offset="0.48" stop-color="#d96b43"/>
+      <stop offset="1" stop-color="#7f3b2c"/>
+    </linearGradient>
+    <radialGradient id="b" cx="0" cy="0" r="1" gradientTransform="translate(21 16) rotate(47) scale(35)">
+      <stop stop-color="#fff" stop-opacity="0.66"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="10" y="10" width="44" height="44" rx="15" transform="rotate(45 32 32)" fill="url(#a)"/>
+  <rect x="10.8" y="10.8" width="42.4" height="42.4" rx="14.2" transform="rotate(45 32 32)" fill="none" stroke="#fff" stroke-opacity="0.34" stroke-width="1.6"/>
+  <path d="M31.5 15.5 18.8 35.2a2.8 2.8 0 0 0 2.4 4.3h8.1l-1.1 9 16.9-22.7a2.8 2.8 0 0 0-2.3-4.5h-9.5l-1.8-5.8Z" fill="#fff"/>
+  <path d="M31.5 15.5 18.8 35.2a2.8 2.8 0 0 0 2.4 4.3h8.1l-1.1 9 16.9-22.7a2.8 2.8 0 0 0-2.3-4.5h-9.5l-1.8-5.8Z" fill="url(#b)"/>
+</svg>

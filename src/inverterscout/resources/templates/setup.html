@@ -1,0 +1,136 @@
+{% from "_icons.html" import icon %}
+<!doctype html>
+<html lang="{{ language }}" dir="{{ direction }}" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ t('setup.title') }}</title>
+  <link rel="icon" href="/static/images/brand.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/theme-init.js"></script>
+</head>
+<body class="setup-body">
+  <main class="setup-shell">
+    <header class="setup-brandbar">
+      <a class="brand" href="/?lang={{ language }}" aria-label="{{ t('app.name') }}">
+        <img src="/static/images/brand.svg" alt="" width="38" height="38">
+        <span class="brand-name">Inverter<span class="brand-suffix"><strong>Scout</strong></span></span>
+      </a>
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        data-label-light="{{ t('common.theme_light') }}"
+        data-label-dark="{{ t('common.theme_dark') }}"
+        aria-label="{{ t('common.theme_dark') }}"
+      >
+        {{ icon('moon', 'icon moon-icon') }}
+        {{ icon('sun', 'icon sun-icon') }}
+      </button>
+    </header>
+
+    <div class="setup-layout">
+      <aside class="setup-intro">
+        <div class="setup-intro-mark">{{ icon('inverter') }}</div>
+        <h1>{{ t('setup.title') }}</h1>
+        <p class="lead">{{ t('setup.subtitle') }}</p>
+        <ul class="setup-trust">
+          <li>{{ icon('check') }}<span>{{ t('setup.inverter_section') }}</span></li>
+          <li>{{ icon('check') }}<span>{{ t('setup.telegram_section') }}</span></li>
+          <li>{{ icon('check') }}<span>{{ t('setup.security_section') }}</span></li>
+        </ul>
+      </aside>
+
+      <form class="setup-form" method="post" action="/setup" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        {% if errors %}<div class="summary-error" role="alert">{{ icon('alert') }}<span>{{ t('setup.validation_error') }}</span></div>{% endif %}
+
+        <fieldset class="setup-section">
+          <legend>{{ icon('language') }}<span>{{ t('setup.language') }}</span></legend>
+          <div class="field-grid">
+            <label for="language">{{ t('setup.language') }}
+              <select id="language" name="language" data-language-select>
+                {% for code, metadata in languages.items() %}
+                <option value="{{ code }}" {% if code == language %}selected{% endif %}>{{ metadata.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label for="timezone">{{ t('setup.timezone') }}
+              <input id="timezone" name="timezone" value="{{ form.timezone }}" list="timezones" lang="en" dir="ltr" autocomplete="off" spellcheck="false" placeholder="Europe/Berlin" required>
+            </label>
+          </div>
+          <datalist id="timezones" lang="en" dir="ltr">{% for timezone in timezones %}<option value="{{ timezone }}">{{ timezone }}</option>{% endfor %}</datalist>
+          <p class="help">{{ t('setup.timezone_help') }}</p>
+          {% if errors.language %}<div class="error">{{ t(errors.language) }}</div>{% endif %}
+          {% if errors.timezone %}<div class="error">{{ t(errors.timezone) }}</div>{% endif %}
+        </fieldset>
+
+        <fieldset class="setup-section">
+          <legend>{{ icon('inverter') }}<span>{{ t('setup.inverter_section') }}</span></legend>
+          <p class="help">{{ t('setup.inverter_help') }}</p>
+          <div class="field-grid">
+            <div>
+              <label for="inverter_host">{{ t('setup.host') }}<input id="inverter_host" name="inverter_host" value="{{ form.inverter_host }}" placeholder="192.168.1.50" required></label>
+              {% if errors.inverter_host %}<div class="error">{{ t(errors.inverter_host) }}</div>{% endif %}
+            </div>
+            <div>
+              <label for="inverter_port">{{ t('setup.port') }}<input id="inverter_port" name="inverter_port" value="{{ form.inverter_port }}" inputmode="numeric" required></label>
+              {% if errors.inverter_port %}<div class="error">{{ t(errors.inverter_port) }}</div>{% endif %}
+            </div>
+            <div>
+              <label for="dongle_serial">{{ t('setup.dongle_serial') }}<input id="dongle_serial" name="dongle_serial" value="{{ form.dongle_serial }}" maxlength="10" pattern="[A-Za-z0-9]{10}" required></label>
+              {% if errors.dongle_serial %}<div class="error">{{ t(errors.dongle_serial) }}</div>{% endif %}
+            </div>
+            <div>
+              <label for="inverter_serial">{{ t('setup.inverter_serial') }}<input id="inverter_serial" name="inverter_serial" value="{{ form.inverter_serial }}" maxlength="10" pattern="[A-Za-z0-9]{10}" required></label>
+              {% if errors.inverter_serial %}<div class="error">{{ t(errors.inverter_serial) }}</div>{% endif %}
+            </div>
+          </div>
+          <p class="help">{{ t('setup.serial_help') }}</p>
+          <label for="poll_interval">{{ t('setup.poll_interval') }}<input id="poll_interval" name="poll_interval" value="{{ form.poll_interval }}" inputmode="numeric" required></label>
+          {% if errors.poll_interval %}<div class="error">{{ t(errors.poll_interval) }}</div>{% endif %}
+        </fieldset>
+
+        <fieldset class="setup-section">
+          <legend>{{ icon('telegram') }}<span>{{ t('setup.telegram_section') }}</span></legend>
+          <p class="help">{{ t('setup.telegram_help') }}</p>
+          <div class="mode-grid">
+            <label class="mode-option">
+              <input type="radio" name="telegram_mode" value="enabled" {% if form.telegram_mode == 'enabled' %}checked{% endif %}>
+              <span class="mode-option-icon">{{ icon('telegram') }}</span>
+              <span>{{ t('setup.telegram_enabled') }}</span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="telegram_mode" value="disabled" {% if form.telegram_mode == 'disabled' %}checked{% endif %}>
+              <span class="mode-option-icon">{{ icon('home') }}</span>
+              <span>{{ t('setup.telegram_disabled') }}</span>
+            </label>
+          </div>
+          {% if errors.telegram_mode %}<div class="error">{{ t(errors.telegram_mode) }}</div>{% endif %}
+          <div id="telegram-fields" {% if form.telegram_mode != 'enabled' %}hidden{% endif %}>
+            <label for="telegram_token">{{ t('setup.telegram_token') }}<input id="telegram_token" type="password" name="telegram_token" value="" autocomplete="new-password"></label>
+            <label for="admin_chat_id">{{ t('setup.admin_chat_id') }}<input id="admin_chat_id" name="admin_chat_id" value="{{ form.admin_chat_id }}" inputmode="numeric"></label>
+            {% if errors.telegram %}<div class="error">{{ t(errors.telegram) }}</div>{% endif %}
+          </div>
+        </fieldset>
+
+        <fieldset class="setup-section">
+          <legend>{{ icon('home') }}<span>{{ t('setup.web_section') }}</span></legend>
+          <div class="setup-warning">{{ icon('alert') }}<span>{{ t('setup.web_warning') }}</span></div>
+        </fieldset>
+
+        <fieldset class="setup-section">
+          <legend>{{ icon('lock') }}<span>{{ t('setup.security_section') }}</span></legend>
+          <div class="setup-security">{{ icon('shield') }}<span>{{ t('setup.security_help') }}</span></div>
+        </fieldset>
+
+        <button class="setup-submit" type="submit"><span>{{ t('setup.submit') }}</span>{{ icon('arrow') }}</button>
+      </form>
+    </div>
+  </main>
+  <script src="/static/js/app.js" defer></script>
+  <script src="/static/js/setup.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible InverterScout defect
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove credentials, serial numbers, chat IDs, private addresses, and encrypted data before submitting.
+  - type: input
+    id: version
+    attributes:
+      label: InverterScout version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Docker Desktop
+        - Linux Docker Engine
+        - NAS container manager
+        - Docker-capable ARM64 board
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      placeholder: Use synthetic values only.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      render: shell
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Data safety
+      options:
+        - label: The report contains no credentials or private user data.
+          required: true

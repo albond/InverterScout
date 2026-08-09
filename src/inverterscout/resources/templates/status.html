@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block content %}
+<div class="page-head">
+  <div class="page-intro">
+    <div class="eyebrow">{{ icon('pulse') }}<span>{{ now_time_str }}</span></div>
+    <h1>{{ t('status.title') }}</h1>
+  </div>
+  <div class="live-pill"><span class="status-dot {% if inverter_info %}ok{% else %}bad{% endif %}"></span>{{ data_age }}</div>
+</div>
+
+{% if not inverter_info %}
+<div class="notice danger" role="alert">{{ icon('alert') }}<span>{{ t('status.no_data') }}</span></div>
+{% else %}
+<section class="energy-grid" aria-live="polite">
+  <article class="energy-card grid-source">
+    <div class="energy-card-head">
+      <span class="energy-label">{{ t('status.grid') }}</span>
+      <span class="energy-icon">{{ icon('grid') }}</span>
+    </div>
+    <div class="energy-value {% if power_source_state == 'grid' %}positive{% elif power_source_state == 'low_voltage' %}warning{% else %}danger{% endif %}">{{ power_source_text }}</div>
+    <div class="energy-detail">{{ grid_voltage_text }}</div>
+  </article>
+
+  <article class="energy-card battery-source">
+    <div class="energy-card-head">
+      <span class="energy-label">{{ t('status.battery') }}</span>
+      <span class="energy-icon">{{ icon('battery') }}</span>
+    </div>
+    <div class="energy-value">{{ soc }}%</div>
+    <div class="energy-detail">{{ battery_voltage_text }} · {{ bat_flow }}</div>
+    <progress class="battery-meter" value="{{ soc }}" max="100" aria-label="{{ t('status.battery') }}: {{ soc }}%"></progress>
+  </article>
+
+  <article class="energy-card house-source">
+    <div class="energy-card-head">
+      <span class="energy-label">{{ t('status.house') }}</span>
+      <span class="energy-icon">{{ icon('home') }}</span>
+    </div>
+    <div class="energy-value">{{ house_power }} W</div>
+    <div class="energy-detail">{{ t('status.grid') }}: {{ grid_import }} W</div>
+  </article>
+
+  <article class="energy-card solar {% if not gen_row_visible %}wide{% endif %}">
+    <div class="energy-card-head">
+      <span class="energy-label">{{ t('status.solar') }}</span>
+      <span class="energy-icon">{{ icon('solar') }}</span>
+    </div>
+    <div class="energy-value">{{ total_pv_power }} W</div>
+    {% if estimate_text %}<div class="energy-detail">{{ estimate_text }}</div>{% endif %}
+  </article>
+
+  {% if gen_row_visible %}
+  <article class="energy-card generator">
+    <div class="energy-card-head">
+      <span class="energy-label">{{ t('status.generator') }}</span>
+      <span class="energy-icon">{{ icon('generator') }}</span>
+    </div>
+    <div class="energy-value {% if gen_bold %}warning{% endif %}">{{ gen_text }}</div>
+  </article>
+  {% endif %}
+</section>
+
+{% if event_label %}
+<div class="notice event-banner">{{ icon('pulse') }}<span><strong>{{ event_label }}</strong> · {{ event_text }}</span></div>
+{% endif %}
+{% endif %}
+
+<section class="metric-grid">
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label">{{ t('status.polls') }}</span><span class="metric-icon">{{ icon('pulse') }}</span></div>
+    <div class="metric">{{ poll_count }}</div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label">{{ t('status.errors') }}</span><span class="metric-icon">{{ icon('alert') }}</span></div>
+    <div class="metric">{{ error_count }}</div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label">{{ t('status.subscribers') }}</span><span class="metric-icon">{{ icon('users') }}</span></div>
+    <div class="metric">{{ subscribers_count }}</div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label">{{ t('status.last_update') }}</span><span class="metric-icon">{{ icon('clock') }}</span></div>
+    <div class="metric small">{{ data_age }}</div>
+  </article>
+</section>
+
+{% if last_error %}<div class="notice danger" role="alert">{{ icon('alert') }}<span>{{ last_error }}</span></div>{% endif %}
+{% endblock %}

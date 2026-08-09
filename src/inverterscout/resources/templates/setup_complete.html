@@ -1,0 +1,23 @@
+{% from "_icons.html" import icon %}
+<!doctype html>
+<html lang="{{ language }}" dir="{{ direction }}" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="refresh" content="4;url=/">
+  <title>{{ t('app.name') }}</title>
+  <link rel="icon" href="/static/images/brand.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/theme-init.js"></script>
+</head>
+<body class="complete-body">
+  <main class="complete-card">
+    <div class="complete-mark">{{ icon('check') }}</div>
+    <h1>{{ t('setup.completed') }}</h1>
+    <p>{{ t('app.name') }}</p>
+  </main>
+  <script src="/static/js/app.js" defer></script>
+</body>
+</html>

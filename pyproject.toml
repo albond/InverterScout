@@ -1,0 +1,95 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inverterscout"
+dynamic = ["version"]
+description = "A secure, self-hosted LuxPower inverter monitor for trusted home networks."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "albond" }]
+keywords = ["inverter", "luxpower", "telegram", "tapo", "tuya", "home-automation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Web Environment",
+  "Framework :: AsyncIO",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Home Automation",
+]
+dependencies = [
+  "aiohttp>=3.9,<4.0",
+  "aiohttp-jinja2>=1.6,<2.0",
+  "cryptography>=50.0,<51.0",
+  "python-telegram-bot[job-queue]>=21.0,<22.0",
+  "tapo>=0.8,<0.9",
+  "tinytuya>=1.13,<2.0",
+  "tzdata>=2024.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/albond/InverterScout"
+Documentation = "https://github.com/albond/InverterScout#readme"
+Repository = "https://github.com/albond/InverterScout"
+Issues = "https://github.com/albond/InverterScout/issues"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.0.3,<10.0",
+  "pytest-asyncio>=1.0,<2.0",
+  "pytest-cov>=6.0,<7.0",
+  "ruff>=0.11,<1.0",
+]
+
+[project.scripts]
+inverterscout = "inverterscout.__main__:main"
+inverterscout-showcase = "inverterscout.devtools.showcase:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "inverterscout.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+inverterscout = [
+  "resources/locales/*.json",
+  "resources/static/css/*.css",
+  "resources/static/images/*.svg",
+  "resources/static/js/*.js",
+  "resources/templates/*.html",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::aiohttp.web.NotAppKeyWarning"]
+
+[tool.coverage.run]
+branch = true
+source = ["inverterscout"]
+
+[tool.coverage.report]
+exclude_also = [
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+show_missing = true
+skip_covered = true
+fail_under = 55
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["inverterscout"]

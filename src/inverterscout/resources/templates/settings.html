@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block content %}
+<div class="page-head">
+  <div class="page-intro">
+    <div class="eyebrow">{{ icon('settings') }}<span>{{ t('nav.settings') }}</span></div>
+    <h1>{{ t('settings.title') }}</h1>
+    <p class="muted">{{ t('settings.restart_note') }}</p>
+  </div>
+</div>
+
+<div class="settings-grid">
+  <form class="panel settings-card general" method="post" action="/settings">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="general">
+    <div class="settings-card-head">
+      <span class="section-icon">{{ icon('language') }}</span>
+      <div><h2>{{ t('setup.language') }}</h2><p>{{ t('setup.timezone_help') }}</p></div>
+    </div>
+    <div class="field-grid">
+      <label>{{ t('setup.language') }}
+        <select name="language">{% for code, metadata in languages.items() %}<option value="{{ code }}" {% if code == settings.language %}selected{% endif %}>{{ metadata.name }}</option>{% endfor %}</select>
+      </label>
+      <label for="timezone">{{ t('setup.timezone') }}
+        <input id="timezone" name="timezone" value="{{ settings.timezone }}" list="timezones" lang="en" dir="ltr" autocomplete="off" spellcheck="false" placeholder="Europe/Berlin" required>
+      </label>
+    </div>
+    <datalist id="timezones" lang="en" dir="ltr">{% for timezone in timezones %}<option value="{{ timezone }}">{{ timezone }}</option>{% endfor %}</datalist>
+    <button type="submit">{{ icon('check') }}<span>{{ t('common.save') }}</span></button>
+  </form>
+
+  <form class="panel settings-card" method="post" action="/settings" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="tapo">
+    <div class="settings-card-head">
+      <span class="section-icon">{{ icon('plug') }}</span>
+      <div><h2>Tapo</h2><p>{{ credential_status.tapo }}</p></div>
+    </div>
+    <div class="field-stack">
+      <label>{{ t('settings.account_email') }}<input type="email" name="tapo_username" autocomplete="off" required></label>
+      <label>{{ t('settings.account_password') }}<input type="password" name="tapo_password" autocomplete="new-password" required></label>
+    </div>
+    <button type="submit">{{ icon('lock') }}<span>{{ t('common.save') }}</span></button>
+  </form>
+
+  <form class="panel settings-card" method="post" action="/settings" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="tuya">
+    <div class="settings-card-head">
+      <span class="section-icon">{{ icon('cloud') }}</span>
+      <div><h2>Tuya</h2><p>{{ credential_status.tuya }}</p></div>
+    </div>
+    <div class="field-stack">
+      <label>{{ t('settings.access_id') }}<input name="tuya_access_id" autocomplete="off" required></label>
+      <label>{{ t('settings.access_secret') }}<input type="password" name="tuya_access_secret" autocomplete="new-password" required></label>
+      <label>{{ t('settings.region') }}<select name="tuya_region"><option value="eu">EU</option><option value="us">US</option><option value="cn">CN</option><option value="in">IN</option></select></label>
+    </div>
+    <button type="submit">{{ icon('lock') }}<span>{{ t('common.save') }}</span></button>
+  </form>
+</div>
+{% endblock %}

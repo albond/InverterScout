@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block content %}
+<div
+  data-devices-page
+  data-on-label="{{ t('devices.state_on') }}"
+  data-off-label="{{ t('devices.state_off') }}"
+  data-online-label="{{ t('devices.online') }}"
+  data-offline-label="{{ t('devices.offline') }}"
+  data-command-label="{{ t('devices.command_sent') }}"
+  data-error-label="{{ t('common.error') }}"
+>
+  <div class="page-head">
+    <div class="page-intro">
+      <div class="eyebrow">{{ icon('plug') }}<span>{{ t('nav.devices') }}</span></div>
+      <h1>{{ t('devices.title') }}</h1>
+      <p class="muted">{{ t('devices.supported') }}</p>
+    </div>
+  </div>
+
+  <div class="device-toast" data-device-toast role="status" aria-live="polite" hidden>
+    {{ icon('check') }}<span></span>
+  </div>
+
+  {% if devices %}
+  <section class="device-grid{% if devices | length == 4 %} is-balanced-four{% endif %}" aria-label="{{ t('devices.title') }}">
+  {% for device in devices %}
+    <article
+      class="panel device-card"
+      data-device-card
+      data-device-id="{{ device.id }}"
+      data-device-enabled="{{ 'true' if device.enabled else 'false' }}"
+      data-state="loading"
+    >
+      <div class="device-card-head">
+        <div class="device-heading">
+          <span class="device-provider-mark {{ device.provider }}">
+            {% if device.provider == 'tuya' %}{{ icon('cloud') }}{% else %}{{ icon('plug') }}{% endif %}
+          </span>
+          <div>
+            <h3><bdi>{{ device.name }}</bdi></h3>
+            <div class="device-provider">
+              <bdi dir="ltr">{{ device.provider | upper }}</bdi>
+              <span aria-hidden="true">·</span>
+              <bdi dir="ltr">{{ device.id }}</bdi>
+            </div>
+          </div>
+        </div>
+        <div class="device-signal" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="device-live-row">
+        <div class="device-state-pill is-loading" data-device-state>
+          <span class="status-dot" data-device-dot></span>
+          <span data-device-state-text>{{ t('common.loading') }}</span>
+        </div>
+        <div class="device-power" data-device-power {% if not device.monitor_consumption %}hidden{% endif %}>
+          {{ icon('pulse') }}
+          <bdi dir="ltr"><strong data-device-power-value>{% if device.current_power is not none %}{{ device.current_power }}{% else %}—{% endif %}</strong> W</bdi>
+        </div>
+      </div>
+
+      <div class="device-capabilities">
+        {% if device.has_scenarios %}
+        <span class="capability-chip">{{ icon('inverter') }}{{ t('devices.automations') }} · {{ device.scenarios | length }}</span>
+        {% else %}
+        <span class="capability-chip muted-chip">{{ icon('plug') }}{{ t('devices.manual_control') }}</span>
+        {% endif %}
+        {% if device.monitor_consumption %}
+        <span class="capability-chip">{{ icon('pulse') }}{{ t('devices.consumption') }}</span>
+        {% endif %}
+      </div>
+
+      {% if device.has_scenarios %}
+      <div class="device-automation-list">
+        {% for scenario in device.scenarios[:2] %}
+        <span><i class="status-dot {% if scenario.enabled %}ok{% endif %}"></i>{{ scenario.trigger_label }} {% if scenario.timer_str %}<small>{{ scenario.timer_str }}</small>{% endif %}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form class="inline-form device-actions" data-device-action-form method="post" action="/devices">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="device_id" value="{{ device.id }}">
+        <button name="action" value="turn_on" data-device-action="turn_on">
+          {{ icon('plug') }}<span>{{ t('devices.turn_on') }}</span>
+        </button>
+        <button name="action" value="turn_off" data-device-action="turn_off" class="secondary">
+          <span>{{ t('devices.turn_off') }}</span>
+        </button>
+      </form>
+    </article>
+  {% endfor %}
+  </section>
+  {% else %}
+  <div class="panel empty-state">{{ icon('devices') }}<span>{{ t('devices.none') }}</span></div>
+  {% endif %}
+
+  <details class="panel add-device-panel">
+    <summary>{{ icon('plus') }}<span>{{ t('devices.add') }}</span></summary>
+    <form id="add-device" method="post" action="/devices/add">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if showcase_mode %}<div class="showcase-form-note">{{ icon('shield') }}<span>{{ t('showcase.add_note') }}</span></div>{% endif %}
+      <div class="field-grid">
+        <label>{{ t('devices.provider') }}
+          <select name="provider" id="provider"><option value="tapo">Tapo</option><option value="tuya">Tuya</option></select>
+        </label>
+        <label>{{ t('devices.address') }}<input name="ip" placeholder="192.168.1.50" required></label>
+      </div>
+      <div id="tapo-fields"><label>{{ t('devices.name') }}<input name="tapo_name" autocomplete="off" required></label></div>
+      <div id="tuya-fields" hidden><label>Tuya Device ID<input name="tuya_device_id" autocomplete="off"></label></div>
+      <button type="submit">{{ icon('plus') }}<span>{{ t('devices.add') }}</span></button>
+    </form>
+  </details>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/devices.js" defer></script>{% endblock %}

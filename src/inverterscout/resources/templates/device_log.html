@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block content %}
+<div class="page-head">
+  <div class="page-intro">
+    <div class="eyebrow">{{ icon('history') }}<span>{{ t('nav.device_log') }}</span></div>
+    <h1>{{ t('nav.device_log') }}</h1>
+  </div>
+  <span class="tag">{{ event_count }}</span>
+</div>
+
+{% if events %}
+<div class="table-wrap responsive-table">
+  <table>
+    <thead><tr><th>{{ t('status.last_update') }}</th><th>{{ t('devices.name') }}</th><th>{{ t('device_log.action') }}</th><th>{{ t('device_log.source') }}</th><th>{{ t('device_log.details') }}</th></tr></thead>
+    <tbody>
+    {% for event in events %}
+    <tr>
+      <td data-label="{{ t('status.last_update') }}"><span class="muted">{{ event.time }}</span></td>
+      <td data-label="{{ t('devices.name') }}">{{ event.device_name }}</td>
+      <td data-label="{{ t('device_log.action') }}"><span class="event-status {% if event.ok %}ok{% else %}bad{% endif %}"><i></i>{{ event.action_label }}</span></td>
+      <td data-label="{{ t('device_log.source') }}"><span class="source-chip">{{ event.source_label }}</span></td>
+      <td data-label="{{ t('device_log.details') }}">{{ event.details }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}<div class="panel empty-state">{{ icon('history') }}<span>—</span></div>{% endif %}
+{% endblock %}
