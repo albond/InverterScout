@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 # Device connection timeout in seconds.
 CONNECT_TIMEOUT = 5
 
+# Region codes and LAN protocol versions supported by TinyTuya 1.20.
+SUPPORTED_TUYA_CLOUD_REGIONS = ("eu", "eu-w", "us", "us-e", "cn", "sg", "in")
+SUPPORTED_TUYA_PROTOCOL_VERSIONS = ("3.1", "3.2", "3.3", "3.4", "3.5")
+
 
 class TuyaDriver(DeviceDriver):
     """Driver for Tuya devices (sockets, switches) via LAN."""

@@ -21,6 +21,10 @@ except ImportError:
 
 from inverterscout.core.state import Event, StateManager
 from inverterscout.devices.manager import DeviceManager
+from inverterscout.devices.tuya import (
+    SUPPORTED_TUYA_CLOUD_REGIONS,
+    SUPPORTED_TUYA_PROTOCOL_VERSIONS,
+)
 from inverterscout.settings.i18n import (
     SUPPORTED_LANGUAGES,
     current_language,
@@ -769,6 +773,7 @@ async def start_web_server(
             "nav_links": NAV_LINKS,
             "msg": msg,
             "devices": devices_list,
+            "tuya_protocol_versions": SUPPORTED_TUYA_PROTOCOL_VERSIONS,
         }
 
     async def web_devices_states(request: web.Request) -> web.Response:
@@ -1133,6 +1138,7 @@ async def start_web_server(
         provider = (data.get("provider", "") or "tuya").strip()
         ip = (data.get("ip", "") or "").strip()
         tuya_device_id = (data.get("tuya_device_id", "") or "").strip()
+        tuya_protocol_version = (data.get("tuya_protocol_version", "3.3") or "3.3").strip()
         tapo_name = (data.get("tapo_name", "") or "").strip()
         scenario_type = data.get("scenario_type", "none")
         timer_hours = 5
@@ -1150,6 +1156,11 @@ async def start_web_server(
         if not _device_mgr:
             return web.json_response(
                 {"ok": False, "error": translate("web.device_manager_unavailable")}
+            )
+
+        if provider == "tuya" and tuya_protocol_version not in SUPPORTED_TUYA_PROTOCOL_VERSIONS:
+            return web.json_response(
+                {"ok": False, "error": translate("web.invalid_tuya_protocol_version")}
             )
 
         if request.app.get("showcase_mode") and hasattr(_device_mgr, "add_showcase_device"):
@@ -1245,8 +1256,12 @@ async def start_web_server(
                     {"ok": False, "error": translate("web.tuya_device_not_found")}
                 )
 
-            name = cloud_dev.get("name", tuya_device_id)
+            name = cloud_dev.get("name") or tuya_device_id
             local_key = cloud_dev.get("key", "")
+            if not local_key:
+                return web.json_response(
+                    {"ok": False, "error": translate("web.tuya_local_key_missing")}
+                )
             device_id = "dev_" + tuya_device_id[:8]
 
             if device_id in _device_mgr.devices:
@@ -1262,7 +1277,7 @@ async def start_web_server(
                 config={
                     "device_id": tuya_device_id,
                     "local_key": local_key,
-                    "version": 3.5,
+                    "version": float(tuya_protocol_version),
                 },
             )
 
@@ -1518,6 +1533,7 @@ async def start_web_server(
         public_settings = {
             "language": stored_settings.get("language", "en"),
             "timezone": stored_settings.get("timezone", "UTC"),
+            "tuya_region": stored_settings.get("tuya_region", "eu"),
         }
         return {
             "title": translate("settings.title"),
@@ -1527,6 +1543,7 @@ async def start_web_server(
             "settings": public_settings,
             "languages": SUPPORTED_LANGUAGES,
             "timezones": IANA_TIMEZONES,
+            "tuya_regions": SUPPORTED_TUYA_CLOUD_REGIONS,
             "credential_status": {
                 "tapo": (
                     translate("settings.configured")
@@ -1569,7 +1586,7 @@ async def start_web_server(
             access_id = str(data.get("tuya_access_id", "")).strip()
             access_secret = str(data.get("tuya_access_secret", ""))
             region = str(data.get("tuya_region", "eu"))
-            if not access_id or not access_secret or region not in {"eu", "us", "cn", "in"}:
+            if not access_id or not access_secret or region not in SUPPORTED_TUYA_CLOUD_REGIONS:
                 raise web.HTTPBadRequest(text=translate("web.settings_tuya_required"))
             settings["tuya_access_id"] = access_id
             settings["tuya_access_secret"] = access_secret

@@ -1,6 +1,6 @@
 """TapoDriver is a driver for controlling TP-Link Tapo devices over LAN.
 
-Uses the tapo library (mihai-dinculescu) for local control.
+Uses the Tapo library for local control.
 Supports Tapo P100/P110/P115, L530 and other devices via generic_device().
 Works with TPAP (lv=2) encryption of new firmware."""
 

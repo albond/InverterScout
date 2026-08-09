@@ -78,7 +78,11 @@ The uploaded archive contains only the runtime build files selected by the launc
 
 The deployment launcher asks for the inverter host and port only to test network reachability. It deliberately does not save them in `.env`. Enter them again in the browser wizard so the application can store them in its encrypted database.
 
+Complete the LuxPower Wi-Fi dongle setup before the browser wizard and use its LAN address from the router's client or DHCP list. Port `8000` is the default verified by InverterScout, not a manufacturer guarantee for every logger or firmware version. Do not expose the dongle port through router forwarding.
+
 If Telegram is enabled, create a private bot with `@BotFather`, enter the token, and provide the administrator chat ID. The wizard does not send a test message. Every additional Telegram user remains pending until manually approved.
+
+Tapo and Tuya are configured after first run. Tuya requires a Smart Home project and authorized app-account link on Tuya Developer Cloud; a Tuya Smart or Smart Life login cannot be entered directly. Follow the [device connection guide](DEVICE_SETUP.md) before adding either provider.
 
 ## Common failures
 
@@ -120,6 +124,14 @@ Confirm the inverter address and TCP port, then check:
 - the inverter TCP service is enabled and listening.
 
 Skipping the test starts the Web UI but does not fix the network route.
+
+### Tuya device is not found
+
+Confirm that the Tuya Developer Cloud project uses the **Smart Home** development method, its required cloud services are active, and the correct Tuya Smart or Smart Life account is linked under **Devices > Link App Account**. Select the same data-center region in InverterScout that the cloud project uses. Resetting or re-pairing a device changes its Local Key, so remove and add that device again.
+
+### Smart device is offline
+
+Reserve the device's IPv4 address in the router and confirm the Docker host can reach it on the same trusted LAN. For Tuya, verify the selected local protocol version with a TinyTuya network scan. For Tapo, confirm the TP-Link ID can control the device in the official Tapo app and that the model is supported by the current Tapo library.
 
 ### Remote Docker permission denied
 

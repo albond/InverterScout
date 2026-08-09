@@ -25,7 +25,7 @@ The launcher guides the deployment from start to finish:
 1. Choose Docker on the current computer, a home NAS/Docker-capable Arduino Linux board, or a remote Linux server.
 2. Choose whether the Web UI is available only on this computer or also to other devices on a trusted home LAN.
 3. Select the Web UI port. If it is occupied, the launcher suggests a nearby free port.
-4. Enter the inverter hostname/IP and TCP port, normally `8000`.
+4. Enter the inverter hostname/IP and start with TCP port `8000`; the logger or firmware may use a different port.
 5. Build the image and optionally test the inverter connection from the same container network used by InverterScout.
 6. Start the service, wait for its healthcheck, and open the first-run browser wizard.
 
@@ -75,9 +75,9 @@ After deployment, complete these browser steps:
 2. Enter the inverter address, TCP port, Wi-Fi dongle serial, and inverter serial.
 3. Choose a polling interval.
 4. Configure a private Telegram bot or explicitly choose operation without Telegram.
-5. Add Tapo or Tuya credentials and devices from Settings and Devices.
+5. Follow the [device connection guide](docs/DEVICE_SETUP.md), then add Tapo or Tuya credentials in Settings and devices in Devices.
 
-See the [deployment guide](docs/DEPLOYMENT.md) for prerequisites, troubleshooting, update paths, and service-management commands.
+See the [deployment guide](docs/DEPLOYMENT.md) for prerequisites, troubleshooting, update paths, and service-management commands. The device guide explains the supported LuxPower dongle flow, Tapo account requirements, and the mandatory Tuya Developer Cloud project.
 
 ## Interface
 
@@ -137,8 +137,8 @@ Do not rely on an experimental model for automation or critical monitoring. Ever
 
 ### Smart devices and deployment hosts
 
-- Tapo switches and bulbs supported by the bundled Tapo library
-- Tuya LAN switches and bulbs supported by the bundled Tuya library
+- Tapo switches and bulbs supported by the bundled, unofficial Tapo local API library; pair them in the official Tapo app first and check the library's [current package documentation](https://pypi.org/project/tapo/)
+- Tuya LAN switches and bulbs using a Local Key obtained from an authorized [Tuya Developer Cloud](https://platform.tuya.com/cloud/) Smart Home project; consumer-app credentials alone are not sufficient
 - Docker hosts on x86-64 or ARM64 Linux, a home computer, or a NAS
 - Docker-capable Arduino Linux boards such as Portenta X8 are an experimental target
 
@@ -185,7 +185,7 @@ Run the Quick Start launcher in a dedicated directory. On macOS or Windows, keep
 
 ### NAS
 
-Create a project in the NAS container manager from `docker-compose.yml`, keep the named volume mounted at `/app/data`, and publish port `8080` only on the NAS LAN address. The container needs outbound internet access only when Telegram or Tuya Cloud discovery is enabled, plus local TCP access to the inverter and smart devices.
+Create a project in the NAS container manager from `docker-compose.yml`, keep the named volume mounted at `/app/data`, and publish port `8080` only on the NAS LAN address. The container needs outbound internet access only when Telegram is enabled or Tuya device metadata and Local Keys are retrieved, plus local TCP access to the inverter and smart devices. Existing Tuya devices are controlled over the LAN after their Local Keys have been stored.
 
 ### ARM64 single-board computer
 

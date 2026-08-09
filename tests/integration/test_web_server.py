@@ -196,6 +196,7 @@ async def test_status_page_translates_dynamic_values_for_requested_language():
 
     assert response.status == 200
     assert 'lang="ar" dir="rtl"' in body
+    assert '<span class="brand-name" dir="ltr">Inverter' in body
     assert "الشبكة متاحة" in body
     assert "متوقف" in body
     assert "Grid available" not in body
@@ -219,6 +220,7 @@ async def test_settings_never_echo_stored_credentials(client, monkeypatch):
         "tuya_access_secret": "private-tuya-secret",
         "language": "en",
         "timezone": "UTC",
+        "tuya_region": "eu-w",
     }
     monkeypatch.setattr(web_server, "load_settings", lambda: private_values.copy())
 
@@ -235,6 +237,141 @@ async def test_settings_never_echo_stored_credentials(client, monkeypatch):
     assert 'list="timezones"' in body
     assert '<datalist id="timezones"' in body
     assert '<option value="Europe/Kyiv">Europe/Kyiv</option>' in body
+    assert '<option value="eu-w" selected>EU-W</option>' in body
+    for region in web_server.SUPPORTED_TUYA_CLOUD_REGIONS:
+        assert f'<option value="{region}"' in body
+
+
+@pytest.mark.asyncio
+async def test_tuya_settings_accept_every_supported_cloud_region(client, monkeypatch):
+    current = {"language": "en", "timezone": "UTC"}
+    saved = []
+    monkeypatch.setattr(web_server, "load_settings", lambda: current.copy())
+    monkeypatch.setattr(web_server, "save_settings", lambda value: saved.append(value))
+    csrf_token = aiohttp_jinja2.get_env(client.app).globals["csrf_token"]
+
+    for region in web_server.SUPPORTED_TUYA_CLOUD_REGIONS:
+        response = await client.post(
+            "/settings",
+            data={
+                "csrf_token": csrf_token,
+                "action": "tuya",
+                "tuya_access_id": "test-access-id",
+                "tuya_access_secret": "test-access-secret",
+                "tuya_region": region,
+            },
+            allow_redirects=False,
+        )
+        assert response.status == 302
+        assert saved[-1]["tuya_region"] == region
+
+
+@pytest.mark.asyncio
+async def test_tuya_settings_reject_unknown_cloud_region(client, monkeypatch):
+    saved = []
+    monkeypatch.setattr(web_server, "save_settings", lambda value: saved.append(value))
+    csrf_token = aiohttp_jinja2.get_env(client.app).globals["csrf_token"]
+
+    response = await client.post(
+        "/settings",
+        data={
+            "csrf_token": csrf_token,
+            "action": "tuya",
+            "tuya_access_id": "test-access-id",
+            "tuya_access_secret": "test-access-secret",
+            "tuya_region": "invalid-region",
+        },
+        allow_redirects=False,
+    )
+
+    assert response.status == 400
+    assert saved == []
+
+
+@pytest.mark.asyncio
+async def test_devices_page_offers_every_supported_tuya_protocol_version(client):
+    response = await client.get("/devices")
+    body = await response.text()
+
+    assert response.status == 200
+    assert 'name="tuya_protocol_version"' in body
+    for version in web_server.SUPPORTED_TUYA_PROTOCOL_VERSIONS:
+        assert f'<option value="{version}"' in body
+
+
+@pytest.mark.asyncio
+async def test_tuya_device_uses_selected_local_protocol_version(client, monkeypatch):
+    class FakeCloud:
+        def __init__(self, **_kwargs):
+            pass
+
+        def getdevices(self):
+            return [{"id": "test-tuya-device", "name": "Test lamp", "key": "local-key"}]
+
+    import tinytuya
+
+    monkeypatch.setattr(tinytuya, "Cloud", FakeCloud)
+    monkeypatch.setattr(web_server, "TUYA_ACCESS_ID", "test-access-id")
+    monkeypatch.setattr(web_server, "TUYA_ACCESS_SECRET", "test-access-secret")
+    device_manager = client.app["device_mgr"]
+    device_manager.add_device.return_value = True
+    csrf_token = aiohttp_jinja2.get_env(client.app).globals["csrf_token"]
+
+    response = await client.post(
+        "/devices/add",
+        data={
+            "csrf_token": csrf_token,
+            "provider": "tuya",
+            "ip": "192.0.2.55",
+            "tuya_device_id": "test-tuya-device",
+            "tuya_protocol_version": "3.4",
+        },
+    )
+
+    assert response.status == 200
+    assert (await response.json())["ok"] is True
+    assert device_manager.add_device.call_args.kwargs["config"] == {
+        "device_id": "test-tuya-device",
+        "local_key": "local-key",
+        "version": 3.4,
+    }
+
+
+@pytest.mark.asyncio
+async def test_tuya_device_is_rejected_when_cloud_returns_no_local_key(client, monkeypatch):
+    class FakeCloud:
+        def __init__(self, **_kwargs):
+            pass
+
+        def getdevices(self):
+            return [{"id": "test-tuya-device", "name": "Test lamp", "key": ""}]
+
+    import tinytuya
+
+    monkeypatch.setattr(tinytuya, "Cloud", FakeCloud)
+    monkeypatch.setattr(web_server, "TUYA_ACCESS_ID", "test-access-id")
+    monkeypatch.setattr(web_server, "TUYA_ACCESS_SECRET", "test-access-secret")
+    device_manager = client.app["device_mgr"]
+    csrf_token = aiohttp_jinja2.get_env(client.app).globals["csrf_token"]
+
+    response = await client.post(
+        "/devices/add",
+        data={
+            "csrf_token": csrf_token,
+            "provider": "tuya",
+            "ip": "192.0.2.55",
+            "tuya_device_id": "test-tuya-device",
+            "tuya_protocol_version": "3.4",
+        },
+    )
+
+    assert response.status == 200
+    assert (await response.json()) == {
+        "ok": False,
+        "error": "Tuya Cloud did not return a Local Key. "
+        "Check the project services and app-account authorization.",
+    }
+    device_manager.add_device.assert_not_called()
 
 
 @pytest.mark.asyncio

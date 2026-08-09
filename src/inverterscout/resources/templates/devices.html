@@ -109,8 +109,20 @@
         </label>
         <label>{{ t('devices.address') }}<input name="ip" placeholder="192.168.1.50" required></label>
       </div>
-      <div id="tapo-fields"><label>{{ t('devices.name') }}<input name="tapo_name" autocomplete="off" required></label></div>
-      <div id="tuya-fields" hidden><label>Tuya Device ID<input name="tuya_device_id" autocomplete="off"></label></div>
+      <div id="tapo-fields" class="provider-fields">
+        <p class="integration-help">{{ t('devices.tapo_help') }}</p>
+        <label>{{ t('devices.name') }}<input name="tapo_name" autocomplete="off" required></label>
+      </div>
+      <div id="tuya-fields" class="provider-fields" hidden>
+        <p class="integration-help">{{ t('devices.tuya_help') }}</p>
+        <div class="field-grid">
+          <label>{{ t('devices.tuya_device_id') }}<input name="tuya_device_id" autocomplete="off"></label>
+          <label>{{ t('devices.tuya_protocol_version') }}
+            <select name="tuya_protocol_version">{% for version in tuya_protocol_versions %}<option value="{{ version }}" {% if version == '3.3' %}selected{% endif %}>{{ version }}</option>{% endfor %}</select>
+            <span class="field-help">{{ t('devices.tuya_protocol_help') }}</span>
+          </label>
+        </div>
+      </div>
       <button type="submit">{{ icon('plus') }}<span>{{ t('devices.add') }}</span></button>
     </form>
   </details>

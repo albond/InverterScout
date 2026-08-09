@@ -36,6 +36,10 @@
       <span class="section-icon">{{ icon('plug') }}</span>
       <div><h2>Tapo</h2><p>{{ credential_status.tapo }}</p></div>
     </div>
+    <div class="integration-help">
+      <p>{{ t('settings.tapo_help') }}</p>
+      <a href="https://pypi.org/project/tapo/" target="_blank" rel="noreferrer">{{ t('settings.tapo_docs') }} <span aria-hidden="true">↗</span></a>
+    </div>
     <div class="field-stack">
       <label>{{ t('settings.account_email') }}<input type="email" name="tapo_username" autocomplete="off" required></label>
       <label>{{ t('settings.account_password') }}<input type="password" name="tapo_password" autocomplete="new-password" required></label>
@@ -50,10 +54,17 @@
       <span class="section-icon">{{ icon('cloud') }}</span>
       <div><h2>Tuya</h2><p>{{ credential_status.tuya }}</p></div>
     </div>
+    <div class="integration-help">
+      <p>{{ t('settings.tuya_help') }}</p>
+      <a href="https://platform.tuya.com/cloud/" target="_blank" rel="noreferrer">{{ t('settings.tuya_docs') }} <span aria-hidden="true">↗</span></a>
+    </div>
     <div class="field-stack">
       <label>{{ t('settings.access_id') }}<input name="tuya_access_id" autocomplete="off" required></label>
       <label>{{ t('settings.access_secret') }}<input type="password" name="tuya_access_secret" autocomplete="new-password" required></label>
-      <label>{{ t('settings.region') }}<select name="tuya_region"><option value="eu">EU</option><option value="us">US</option><option value="cn">CN</option><option value="in">IN</option></select></label>
+      <label>{{ t('settings.region') }}
+        <select name="tuya_region">{% for region in tuya_regions %}<option value="{{ region }}" {% if region == settings.tuya_region %}selected{% endif %}>{{ region | upper }}</option>{% endfor %}</select>
+        <span class="field-help">{{ t('settings.region_help') }}</span>
+      </label>
     </div>
     <button type="submit">{{ icon('lock') }}<span>{{ t('common.save') }}</span></button>
   </form>

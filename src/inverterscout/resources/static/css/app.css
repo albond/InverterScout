@@ -1726,6 +1726,36 @@
     margin-top: 18px;
   }
 
+  .provider-fields {
+    display: grid;
+    gap: 18px;
+  }
+
+  .provider-fields[hidden] {
+    display: none;
+  }
+
+  .integration-help {
+    padding: 13px 15px;
+    border: 1px solid color-mix(in srgb, var(--accent), transparent 78%);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--accent-soft), var(--panel) 68%);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+
+  .integration-help p + a {
+    display: inline-flex;
+    margin-top: 7px;
+  }
+
+  .integration-help a {
+    font-weight: 720;
+    text-underline-offset: 3px;
+  }
+
   .settings-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1745,6 +1775,10 @@
     align-items: flex-start;
     gap: 14px;
     margin-bottom: 22px;
+  }
+
+  .settings-card-head + .integration-help {
+    margin: -8px 0 20px;
   }
 
   .settings-card-head .section-icon {
