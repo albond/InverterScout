@@ -1,5 +1,22 @@
 # InverterScout
 
+[![License: MIT](https://img.shields.io/github/license/albond/InverterScout?color=E08963&style=flat-square)](LICENSE)
+[![Project status: alpha](https://img.shields.io/badge/status-alpha-D97706?style=flat-square)](#quick-start)
+[![Python 3.12–3.14](https://img.shields.io/badge/Python-3.12%E2%80%933.14-3776AB?logo=python&logoColor=white&style=flat-square)](https://www.python.org/)
+[![Docker ready](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white&style=flat-square)](#quick-start)
+[![CI](https://img.shields.io/github/actions/workflow/status/albond/InverterScout/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/albond/InverterScout/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/albond/InverterScout/codeql.yml?branch=main&label=CodeQL&style=flat-square)](https://github.com/albond/InverterScout/actions/workflows/codeql.yml)
+
+[![Self-hosted](https://img.shields.io/badge/Deployment-self--hosted-8B5CF6?style=flat-square)](#security-model)
+[![Encrypted local storage](https://img.shields.io/badge/Storage-encrypted-2EA043?logo=sqlite&logoColor=white&style=flat-square)](#security-model)
+[![No telemetry](https://img.shields.io/badge/Telemetry-none-2EA043?style=flat-square)](#security-model)
+[![Read-only inverter access](https://img.shields.io/badge/Inverter-read--only-2EA043?style=flat-square)](#security-model)
+
+[![GitHub stars](https://img.shields.io/github/stars/albond/InverterScout?style=flat-square&color=E08963)](https://github.com/albond/InverterScout)
+[![Last commit](https://img.shields.io/github/last-commit/albond/InverterScout?style=flat-square)](https://github.com/albond/InverterScout/commits/main)
+[![Open issues](https://img.shields.io/github/issues/albond/InverterScout?style=flat-square)](https://github.com/albond/InverterScout/issues)
+[![Donate](https://img.shields.io/badge/Donate-USDC%20%E2%80%A2%20USDT%20%E2%80%A2%20EURC-7B3FE4?logo=ethereum&logoColor=white&style=flat-square)](#-support-the-project)
+
 InverterScout is a self-hosted monitor for selected LuxPower SNA inverters and Tapo or Tuya smart devices. It reads inverter input registers without writing to the inverter, shows a local dashboard, and can send alerts through a private Telegram bot.
 
 The application is designed for a trusted home network. The Web UI is for use inside that network. Telegram is the supported way to interact with the system while away from home.
